@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Gantt Chart Example 1</title>
+<link type="text/css" href="http://mbostock.github.io/d3/style.css" rel="stylesheet" />
+<link type="text/css" href="example.css" rel="stylesheet" />
+<link type="text/css" href="jquery.qtip.css" rel="stylesheet" />
+</head>
+<body>
+	<div id="container"></div>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script type="text/javascript" src="./jquery.qtip.js"></script>
+	<script type="text/javascript" src="../lib/d3/d3.v3.min.js"></script>
+	<script type="text/javascript" src="../g.js"></script>
+	<script type="text/javascript" src="example.js"></script>
+	<script>
+	$('.xxx').qtip({
+		content: {
+			//text: 'Support for SVG with no extra configuration! Awesome.'
+			attr: 'data-tooltip',
+			title: function(event, api) {
+            // Retrieve content from ALT attribute of the $('.selector') element
+            return $(this).attr('data-title');
+        }
+		},
+		position: {
+			my: 'top left',
+			at: 'bottom right'
+		},
+		style: { classes: 'qtip-bootstrap qtip-shadow' }
+	});
+	</script>
+</body>
+</html>

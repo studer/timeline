@@ -1,0 +1,10 @@
+[
+  {"name":"Bat aide cdmt 1",  "start":new Date(2014, 0, 13),  "end":new Date(2014, 0, 31) },
+    {"name": "Bat expl 1",	"start":new Date(2014, 8, 15), "end":new Date(2014, 9, 3) },
+    {"name": "Pz Bat 12",	"start":new Date(2014, 4, 19),  "end":new Date(2014, 4, 31) },
+    {"name": "Bat chars 17",  "start":new Date(2014, 3, 14),  "end":new Date(2014, 4, 2) },
+    {"name": "Bat chars 18",  "start":new Date(2014, 8, 15),  "end":new Date(2014, 9, 3) },
+    {"name": "Inf Bat 16",  "start":new Date(2014, 0, 13),  "end":new Date(2014, 0, 31) },
+    {"name": "Gr art 1",	"start":new Date(2014, 3, 21), "end":new Date(2014, 4, 9) },
+    {"name": "Bat G 2",	"start":new Date(2014, 7, 4),  "end":new Date(2014, 7, 22) }
+ ]

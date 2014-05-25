@@ -1,0 +1,190 @@
+<html>
+<head>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript" src="./jquery.qtip.js"></script>
+<script src="d3.min.js" charset="utf-8"></script>
+<style type="text/css">
+body{font-family: Arial, sans-serif;font-size:10px;}
+.axis path,.axis line {fill: none;stroke:#b6b6b6;shape-rendering: crispEdges;}
+/*.tick line{fill:none;stroke:none;}*/
+.tick text{fill:#999;}
+g.journal.active{cursor:pointer;}
+text.label{font-size:12px;font-weight:bold;cursor:pointer;}
+text.value{font-size:12px;font-weight:bold;}
+</style>
+<link type="text/css" href="jquery.qtip.css" rel="stylesheet" />
+</head>
+<body>
+
+<div id="container"></div>
+
+<script type="text/javascript">
+function truncate(str, maxLength, suffix) {
+	if(str.length > maxLength) {
+		str = str.substring(0, maxLength + 1);
+		str = str.substring(0, Math.min(str.length, str.lastIndexOf(" ")));
+		str = str + suffix;
+	}
+	return str;
+}
+
+var margin = {top: 20, right: 200, bottom: 0, left: 20},
+	width = 800,
+	height = 400,
+	shift = 30;
+
+var start_month = 01,
+	end_month = 12;
+
+var start_week = 01,
+	end_week = 52;
+
+var c = d3.scale.category10();
+
+var xMonth = d3.time.scale()
+		.domain([new Date("2011-12-31"), new Date("2012-12-31")])
+		.range([0, width]);
+
+//var x = d3.scale.linear()
+//	.range([0, width]);
+
+var x = d3.time.scale()
+    .domain([new Date("2011-12-31"), new Date("2012-12-31")])
+    .range([0, width]);
+
+var weekAxis = d3.svg.axis()
+	.scale(x)
+	.ticks(d3.time.weeks, 1)
+	.tickFormat(d3.time.format('%W'))
+	.orient("bottom");
+
+var monthAxis = d3.svg.axis()
+	.scale(x)
+	.ticks(d3.time.months, 1)
+	.tickFormat(d3.time.format('%B'))
+	.orient("top");
+
+var svg = d3.select("#container").append("svg")
+	.attr("id", "chart")
+	.attr("preserveAspectRatio", "xMinYMin")
+	.attr("width", width + margin.left + margin.right)
+	.attr("height", height + margin.top + margin.bottom)
+	.style("margin-left", margin.left + "px")
+	.append("g")
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+ svg.selectAll("line.x2")
+  .data(x.ticks(53))
+  .enter().append("line")
+  .attr("class", "x2")
+  .attr("x1", x)
+  .attr("x2", x)
+  .attr("y1", 0)
+  .attr("y2", 700)
+  .style("stroke", c(0));
+
+svg.selectAll("line.x")
+.data(x.ticks(12))
+.enter().append("line")
+.attr("class", "x")
+.attr("x1", x)
+.attr("x2", x)
+.attr("y1", 0)
+.attr("y2", 700)
+.style("stroke", c(1));
+
+svg.selectAll('.x text')
+        .attr('transform', 'translate(20)');
+
+
+d3.json("journals_tdcs.json", function(data) {
+	//x.domain([start_week, end_week]);
+	//xMonth.domain([start_month, end_month]);
+	var xScale = d3.scale.linear()
+		.domain([start_week, end_week])
+		.range([0, width]);
+
+	svg.append("g")
+		.attr("class", "x axis")
+		.attr("transform", "translate(0," + 0 + ")")
+		.call(monthAxis);
+
+	svg.append("g")
+		.attr("class", "x axis")
+		.attr("transform", "translate(0," + shift + ")")
+		.call(weekAxis);
+
+	for (var j = 0; j < data.length; j++) {
+		var g = svg.append("g").attr("class","journal");
+
+		var rects = g.selectAll("rect")
+			.data(data[j]['weeks'])
+			.enter()
+			.append("rect");
+
+		var text = g.selectAll("text")
+			.data(data[j]['weeks'])
+			.enter()
+			.append("text");
+
+		var rScale = d3.scale.linear()
+			.domain([0, d3.max(data[j]['weeks'], function(d) { return d[1]; })])
+			.range([2, 9]);
+
+		rects
+			.attr("x", function(d, i) { return xScale(d[0]); })
+			.attr("y", j*20+20+shift-10)
+			.attr("width", 20)
+			.attr("height", 20)
+			//.attr("r", function(d) { return rScale(d[1]); })
+			.style("fill", function(d) { return c(j); });
+
+		text
+			.attr("y", j*20+25+shift)
+			.attr("x",function(d, i) { return xScale(d[0])+3; })
+			.attr("class","value")
+			.text(function(d){ return d[0]; })
+			//.style("fill", function(d) { return c(j); })
+			.style("fill", "black");
+			//.style("display","none");
+
+		g.append("text")
+			.attr("y", j*20+25+shift)
+			.attr("x",width+20)
+			.attr("class","label")
+			.text(truncate(data[j]['name'],30,"..."))
+			.style("fill", function(d) { return c(j); })
+			.on("mouseover", mouseover)
+			.on("mouseout", mouseout);
+	};
+
+	function mouseover(p) {
+		var g = d3.select(this).node().parentNode;
+		d3.select(g).selectAll("rect").style("display","none");
+		d3.select(g).selectAll("text.value").style("display","block");
+	}
+
+	function mouseout(p) {
+		var g = d3.select(this).node().parentNode;
+		d3.select(g).selectAll("rect").style("display","block");
+		//d3.select(g).selectAll("text.value").style("display","none");
+	}
+});
+
+</script>
+
+<script>
+var chart = $("#chart"),
+	aspect = chart.width() / chart.height(),
+	container = chart.parent();
+$(window).on("resize", function() {
+	var targetWidth = container.width();
+	chart.attr("width", targetWidth);
+	chart.attr("height", Math.round(targetWidth / aspect));
+}).trigger("resize");
+
+</script>
+
+</body>
+</html>
